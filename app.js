@@ -190,23 +190,32 @@ const deleteUser= (req,res)=>{
 
 //other way of writing above 5 lines
 //(3) ROUTES
-app.route('/api/v1/tours')
+
+const tourRouter =express.Router();
+const userRouter =express.Router();
+
+tourRouter('/')
     .get( getAllTour)
     .post(createTour);
 
-app.route('/api/v1/tours/:id')
+tourRouter('/:id')
     .get( getTour)
     .patch(updateTour)
     .delete(deleteTour);
 
-app.route('/api/v1/users')
+userRouter('/')
     .get( getAllUser)
     .post(createUser);
 
-app.route('/api/v1/users/:id')
+userRouter('/:id')
     .get( getUser)
     .patch(updateUser)
     .delete(deleteUser);
+
+app.use('/api/v1/tours',tourRouter);    //middleware 
+    //this is called mounting a router on a route.
+app.use('/api/v1/users',userRouter);
+
 //(4) starting server
 const port=3000;
 
