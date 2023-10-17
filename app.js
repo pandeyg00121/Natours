@@ -10,7 +10,8 @@ app.use(morgan('dev'));
 //Morgan is 3rd party middleware from NPM and it helps us in getting URL,statusCode,HTTP method,time and space 
 // e.g. "GET /api/v1/tours 200 8.574 ms - 8765" for getAllTour Route
 app.use(express.json());
-
+app.use(express.static(`${__dirname}/public`));
+//middleware to view static files
 
 //    (1)creating middlewares by use method
 app.use((req,res,next)=>{                   
@@ -33,11 +34,4 @@ app.use('/api/v1/tours',tourRouter);    //middleware
     //this is called mounting a router on a route.
 app.use('/api/v1/users',userRouter);
 
-//(4) starting server
-const port=3000;
-
-app.listen(port,()=>{
-
-    console.log(`App running at port: ${port}....`);
-
-});
+module.exports=app;
