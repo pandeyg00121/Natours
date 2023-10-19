@@ -3,13 +3,13 @@ const express=require('express');
 
 const tourController=require('./../controllers/tourController');
 const router =express.Router();
+router.use(express.json());
 
-
-router.param('id',tourController.checkId);
+// router.param('id',tourController.checkId);
 
 router.route('/')
     .get( tourController.getAllTour)
-    .post(tourController.checkBody,tourController.createTour);  
+    .post(tourController.createTour);  
     //chaining multiple middleware to same POST request 
     //firstly written will be executed first and then next one
 
