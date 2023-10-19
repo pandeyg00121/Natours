@@ -15,40 +15,25 @@ dotenv.config({ path: './config.env' });
 mongoose.connect(process.env.DATABASE_LOCAL,{
     useNewUrlParser:true,
     useCreateIndex:true,
-    useFindAndModify:false
+    useFindAndModify:false,
+    useUnifiedTopology:true
 }).then(() => console.log('DB connected Successfull....'));
 
-const tourSchema=new mongoose.Schema({
-    name:{
-        type: String,
-        required: [true,'A tour must have a name'],
-        unique: true
-    },
-    rating: {
-        type: Number,
-        default: 4.5
-    },
-    price:{
-        type: Number,
-        required: [true,'A tour must have a price']
-    }
-});
-
-const Tour=mongoose.model('Tour',tourSchema);
-
 //to add new data in tours collection
-const testTour=new Tour({
-    name:'The hiker 3',
-    // rating:4.7,
-    price: 497
-});
+// const testTour=new Tour({
+//     name:'The hiker 3',
+//     // rating:4.7,
+//     price: 497
+// });
+//to save the data
+// testTour.save().then(doc => {
+    // console.log(doc);
+// })
+// .catch(err => {
+    // console.log('Error :',err);
+// });
 
-testTour.save().then(doc => {
-    console.log(doc);
-})
-.catch(err => {
-    console.log('Error :',err);
-});
+
 const port=process.env.PORT || 3000;
 // console.log(process.env);
 
