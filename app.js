@@ -1,18 +1,20 @@
 const fs=require('fs');
+
 const morgan=require('morgan');
 const express=require('express');
+var bodyParser = require('body-parser');
 
 const tourRouter=require('./routes/tourRoutes');
 const userRouter=require('./routes/userRoutes');
 const app=express();
 
 // 1) MIDDLEWARES
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-  }    
+app.use(morgan('dev'));
 //Morgan is 3rd party middleware from NPM and it helps us in getting URL,statusCode,HTTP method,time and space 
 // e.g. "GET /api/v1/tours 200 8.574 ms - 8765" for getAllTour Route
-app.use(express.json());
+// app.use(express.json());
+
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(`${__dirname}/public`));
 //middleware to view static files
 
