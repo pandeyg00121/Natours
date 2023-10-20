@@ -3,6 +3,13 @@ const express=require('express');
 
 const Tour=require('./../models/tourModel');
 
+exports.aliasTopTours=(req,res,next)=>{
+    req.query.limit='5';
+    req.query.sort='-ratingsAverage,price';
+    req.query.fields='name,price,duration,summary,ratingsAverage';
+
+    next();
+}
 exports.getAllTour= async (req,res)=>{ 
     try{
     //Build query
@@ -28,13 +35,23 @@ exports.getAllTour= async (req,res)=>{
     }
 
     //4) field limiting
-    if (req.query.fields) {
+       if (req.query.fields) {
         const fields = req.query.fields.split(',').join(' ');
         query = query.select(fields);
       } else {
         query = query.select('-__v');   
         //'-__v' means excluding __v field
       }
+
+    //5) Pagination
+
+    const page=req.query.page*1 || 1;
+    const limit=req.query.limit*1 || 100;
+
+    const skip=(page-1)*limit;
+
+    query=query.skip(skip).limit(limit);
+
     //Execute QUERY
     const tours = await query;
 
