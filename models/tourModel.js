@@ -1,5 +1,6 @@
 const mongoose=require('mongoose');
 const slugify=require('slugify');
+const validator=require('validator');
 
 const tourSchema=new mongoose.Schema({
     name:{
@@ -8,8 +9,9 @@ const tourSchema=new mongoose.Schema({
         unique: true,
         trim:true,  //trim removes extra space in front or back of word
         maxLength : [40,'A tour must have less than or equal to 40 characters'],
-        //these both are Vatidators
+        //these both are DATA Vatidators
         minLength : [5,'A tour must have more than or equal to 5 characters'],
+        // validate: [validator.isAlpha, 'name can only alphabetical']
     },
     slug:String,
     duration:{
@@ -22,13 +24,19 @@ const tourSchema=new mongoose.Schema({
     },
     difficulty:{
         type: String,
-        required:[true,'A tour must have a difficulty']
+        required:[true,'A tour must have a difficulty'],
+        //in order to restrict difficulty to only three values we use enum
+        //enum is only for strings
+        enum: {
+            values: ['easy','medium','difficult'],
+            message:'Difficulty is either easy,medium or hard'
+        }
     },
     ratingsAverage: {
         type: Number,
         default: 4.5,
         max : [5,'A tour must have less than or equal to 5 rating'],
-        //these both are Vatidators
+        //these both are DATA Vatidators
         min : [1,'A tour must have more than or equal to 1 rating'],
 
     },
@@ -41,7 +49,15 @@ const tourSchema=new mongoose.Schema({
         type: Number,
         required: [true,'A tour must have a price']
     },
-    priceDiscount: Number,
+    priceDiscount: {
+        type:Number,
+        validate:{
+            validator:function(val){
+                      return val<this.price;
+        },
+            message:'discount price ({VALUE}) should be less than actual price',
+     }
+    },
     summary:{
         type:String,
         trim:true       //removes space in beginning and end of Text
