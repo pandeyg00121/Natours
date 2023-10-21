@@ -18,13 +18,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(`${__dirname}/public`));
 //middleware to view static files
 
-//    (1)creating middlewares by use method
-app.use((req,res,next)=>{                   
-    //use method is used to create middleware route
-    //third argument is always nex as it specifies where the middleware moves
-    console.log("hello from middleware");
-    next();
-});
 
 app.use((req,res,next)=>{                   
     req.requestTime= new Date().toISOString();    
@@ -39,4 +32,28 @@ app.use('/api/v1/tours',tourRouter);    //middleware
     //this is called mounting a router on a route.
 app.use('/api/v1/users',userRouter);
 
+//for unhandled routes
+app.all('*', (req,res,next) =>{
+    // res.status(404).json({
+    //     status: 'fail',
+    //     message: `Can't find ${req.originalUrl} on this server`
+    // });
+
+    //handling unhandled Routes through error handling middleware
+    const err= new Error(`Can't find ${req.originalUrl} on this server`);
+    err.statusCode=404;
+    err.status='fail';
+    next(err);
+});
+
+//error handling middleware
+app.use((err,req,res,next) => {
+    err.statusCode=err.statusCode || 500;
+    err.status=err.status || 'error';
+
+    res.status( err.statusCode).json({
+        status: err.status,
+        message: err.message
+    });
+});
 module.exports=app;
