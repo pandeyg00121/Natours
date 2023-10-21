@@ -10,7 +10,11 @@ router.use(express.json());
 router.route('/top-5-tours')
     .get(tourController.aliasTopTours,tourController.getAllTour)
 
+router.route('/tour-stats')
+    .get(tourController.getTourStats);
 
+router.route('/monthly-plan/:year')
+    .get(tourController.getMonthlyPlan);
 router.route('/')
     .get( tourController.getAllTour)
     .post(tourController.createTour);  
