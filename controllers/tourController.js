@@ -64,31 +64,24 @@ exports.getTour= async (req,res)=>{
       }
 }
 
+const catchAsync =fn => {
+  return (req,res,next) =>{
+  fn(req,res,next).catch(err => next(err) );
+  };
+}
 
-exports.createTour=async (req,res)=>{  
+exports.createTour= catchAsync( async (req,res,next)=>{  
     console.log(req.body);
-  try{
-    // one way of adding data 
-    // const newTour=new Tour({name:String,price:Number}).then().catch();
-    // newTour.save();           
-    
-    // another way
+
     const newTour= await Tour.create(req.body);
-    console.log(req.body);
+
     res.status(201).json({  
         status:'sucess',
         data:{
             tour: newTour
         }
     });
-   }
-   catch(err){
-    res.status(404).json({  
-        status:'fail',
-        message:'invalid data sent'
-    });  
-   }
-}
+})
 
 exports.updateTour= async (req,res)=>{                    
 try{
