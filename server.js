@@ -11,6 +11,11 @@ const app = require('./app');
 //     process.env.DATABASE_PASSWORD
 // );
 
+process.on('uncaughtException', err =>{
+    console.log('Uncaught Exception ...');
+    console.log(err.name ,err.message);
+    process.exit(1);
+});
 
 mongoose.connect(process.env.DATABASE_LOCAL,{
     useNewUrlParser:true,
@@ -22,7 +27,7 @@ mongoose.connect(process.env.DATABASE_LOCAL,{
 const port=process.env.PORT || 3000;
 // console.log(process.env);
 
-app.listen(port,()=>{
+const server = app.listen(port,()=>{
    
     const date = new Date(); // Get the current date and time
     const jsonString = JSON.stringify(date);
@@ -31,3 +36,14 @@ app.listen(port,()=>{
     console.log(`App running at port: ${port}....`);
 
 });
+
+process.on('unhandledRejection',err =>{
+    console.log('Unhandled Rejection...');
+    console.log(err.name ,err.message);
+    //close the server
+    server.close(()=>{
+        process.exit(1);
+    //0 stands for success and 1 for uncaught exception
+    });
+});
+
