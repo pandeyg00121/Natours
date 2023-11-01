@@ -5,6 +5,7 @@ const userController=require('./../controllers/userController');
 
 
 const router =express.Router();
+router.use(express.json());
 
 router.route('/')
     .get(userController.getAllUsers)
