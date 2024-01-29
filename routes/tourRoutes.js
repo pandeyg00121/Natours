@@ -2,6 +2,7 @@ const fs=require('fs');
 const express=require('express');
 
 const tourController=require('./../controllers/tourController');
+const authController = require('./../controllers/authController');
 const router =express.Router();
 router.use(express.json());
 
@@ -16,7 +17,7 @@ router.route('/tour-stats')
 router.route('/monthly-plan/:year')
     .get(tourController.getMonthlyPlan);
 router.route('/')
-    .get( tourController.getAllTour)
+    .get( authController.protect,tourController.getAllTour)
     .post(tourController.createTour);  
     //chaining multiple middleware to same POST request 
     //firstly written will be executed first and then next one
