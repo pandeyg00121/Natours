@@ -14,7 +14,10 @@ const handleDuplicateFieldsDB = err => {
     return new AppError(message, 400);
   };
 
-  const handleValidationErrorDB = err => {
+const handleJWTError = err => new AppError('Invalid Token .Please log in Again',401);
+
+const handleJWTExpiredError = err => new AppError('Your Token has expired Kindly log in again',401)
+const handleValidationErrorDB = err => {
     const errors = Object.values(err.errors).map(el => el.message);
     const message = `Invalid input data. ${errors.join('. ')}`;
     //exctracting error messages from different kind of validation fails and joining them
@@ -72,7 +75,10 @@ module.exports = ((err,req,res,next) => {
 
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error);
-
+    if (error.name === 'JsonWebTokenError')
+      error = handleJWTError(error);
+    if (error.name === 'TokenExpiredError')
+      error = handleJWTExpiredError(error);
     sendErrorProd(error, res);
   }
    
