@@ -79,3 +79,31 @@ exports.protect = catchAsync(async(req ,res ,next )=>{
     req.user=freshUser;
     next();
 });
+
+//we cannot pass argument to a middleware function so we make middleware 
+//inside a wrapper function so that it gets acess to parameters
+//roles is an array ['admin','lead-guide']
+
+exports.restrictTo = (...roles)=>{
+    return (req,res,next) => {
+        if(!roles.includes(req.freshUser.role)){
+            return next(new AppError('You Do not have permission to perform this task',403));
+        }
+    }
+    next();
+}
+
+exports.forgotPassword = catchAsync(async(req,res,next) =>{
+    // 1) Get user on POSTed Email
+    const user = await User.findOne({ email:req.body.email});
+    if(!user){
+        return next(new AppError('There is no user with email address',404));
+    }
+    // 2) Generate token
+    const resetToken = user.createPasswordResetToken();
+    await user.save({validateBeforeSave : false});
+});
+
+exports.resetPassword = (req,res,next) =>{
+
+};
