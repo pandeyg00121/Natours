@@ -12,6 +12,18 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user
+    }
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -20,14 +32,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken( newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -44,12 +49,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !correct) {
     return next(new AppError("Incorrect Email or password", 401));
   }
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken( user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -151,11 +151,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gte: Date.now() }
+    passwordResetExpires: { $gte: Date.now() },
   });
   //2)If token has not expired and user exists then set the new password
-  if(!user){
-    return next(new AppError('Token is invalid or expired',400));
+  if (!user) {
+    return next(new AppError("Token is invalid or expired", 400));
   }
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
@@ -168,10 +168,25 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //updated changedPassword field in DB using pre save method of mongoose
 
   //4) log the user in send JWT
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken( user, 200, res);
 });
 
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //1) Get user from collection
+  const user = await User.findById(req.user.id).select("+password");
+
+  // 2) check if POSTed password matches
+  const correct = await user.correctPassword(req.body.password, user.password);
+
+  if (!correct) {
+    return next(new AppError("You entered Wrong current password", 401));
+  }
+
+  //3) if So update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  //4) Log user in
+  createSendToken( user, 200, res);
+});
