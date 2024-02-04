@@ -1,54 +1,59 @@
-const fs=require('fs');
+const fs = require("fs");
+const morgan = require("morgan");
+const express = require("express");
+const ratelimit = require("express-rate-limit");
 
-const morgan=require('morgan');
-const express=require('express');
-var bodyParser = require('body-parser');
+var bodyParser = require("body-parser");
 
-const AppError=require('./utils/appError');
-const globalErrorHandler = require('./controllers/errorController');
-const tourRouter=require('./routes/tourRoutes');
-const userRouter=require('./routes/userRoutes');
+const AppError = require("./utils/appError");
+const globalErrorHandler = require("./controllers/errorController");
+const tourRouter = require("./routes/tourRoutes");
+const userRouter = require("./routes/userRoutes");
 
-const app=express();
+const app = express();
 
-// 1) MIDDLEWARES
-app.use(morgan('dev'));
+// GLOBAL MIDDLEWARES
+app.use(morgan("dev"));
 
+const limiter = ratelimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many request at same time from your IP address..Hold your Horses!!",
+});
+app.use("/api", limiter);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(`${__dirname}/public`));
 //middleware to view static files
 
-
-app.use((req,res,next)=>{                   
-    req.requestTime= new Date().toISOString();    
-    //ISOString converts timestamp to readable string
-    console.log(req.headers);
-    next();
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  //ISOString converts timestamp to readable string
+  console.log(req.headers);
+  next();
 });
-
 
 //(3) ROUTES
 
-app.use('/api/v1/tours',tourRouter);    //middleware 
-    //this is called mounting a router on a route.
-app.use('/api/v1/users',userRouter);
+app.use("/api/v1/tours", tourRouter); //middleware
+//this is called mounting a router on a route.
+app.use("/api/v1/users", userRouter);
 
 //for unhandled routes
-app.all('*', (req,res,next) =>{
-    // res.status(404).json({
-    //     status: 'fail',
-    //     message: `Can't find ${req.originalUrl} on this server`
-    // });
+app.all("*", (req, res, next) => {
+  // res.status(404).json({
+  //     status: 'fail',
+  //     message: `Can't find ${req.originalUrl} on this server`
+  // });
 
-    //handling unhandled Routes through error handling middleware
-    // const err= new Error(`Can't find ${req.originalUrl} on this server`);
-    // err.statusCode=404;
-    // err.status='fail';
+  //handling unhandled Routes through error handling middleware
+  // const err= new Error(`Can't find ${req.originalUrl} on this server`);
+  // err.statusCode=404;
+  // err.status='fail';
 
-    next(new AppError(`Can't find ${req.originalUrl} on this server`,404));
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
 //error handling middleware
 app.use(globalErrorHandler);
 
-module.exports=app;
+module.exports = app;
