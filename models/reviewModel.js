@@ -33,7 +33,19 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+//to populate tour name and user name from objectId
+reviewSchema.pre(/^find/, function (next) {
+    //select hides the properties with -sign
+    this.populate({
+      path: "tour",
+      select: "name",
+    }).populate({
+        path: "user",
+        select: "name photo",
+    });
+    next();
+});
+
 
 const Review = mongoose.model("Review", reviewSchema);
-
 module.exports = Review;
