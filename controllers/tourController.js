@@ -34,6 +34,7 @@ exports.getTour= catchAsync(async (req,res,next)=>{
 
     console.log(req.params);
     const tour = await Tour.findById(req.params.id);
+
     //const tour=await Tour.findOne({ _id:req.params.id });
 
     if (!tour) {
