@@ -2,15 +2,25 @@ const express = require("express");
 
 const reviewController = require("./../controllers/reviewController");
 const authController = require("./../controllers/authController");
-const router = express.Router( {mergeParams:true});
+const router = express.Router({ mergeParams: true });
 router.use(express.json());
 
 //POST( /tour/345678ugfdeyh9iu/reviews ) -->to create review for particular tour
 //GET( /tour/345678ugfdeyh9iu/reviews )  -->to view review's of a particular tour
 router
-  .route('/')
+  .route("/")
   .get(reviewController.getAllReviews)
-  .post(authController.protect, authController.restrictTo('user'),reviewController.createReview);
+  .post(
+    authController.protect,
+    authController.restrictTo("user"),
+    reviewController.setTourUserIds,
+    reviewController.createReview
+  );
 
+router
+  .route("/:id")
+  .get(reviewController.getReview)
+  .delete(reviewController.deleteReview)
+  .patch(reviewController.updateReview);
 
-module.exports=router;
+module.exports = router;
