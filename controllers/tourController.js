@@ -33,7 +33,7 @@ exports.getAllTour= catchAsync(async (req,res,next)=>{
 exports.getTour= catchAsync(async (req,res,next)=>{   
 
     console.log(req.params);
-    const tour = await Tour.findById(req.params.id);
+    const tour = await Tour.findById(req.params.id).populate('reviews');
 
     //const tour=await Tour.findOne({ _id:req.params.id });
 
@@ -93,7 +93,7 @@ exports.deleteTour= catchAsync(async (req,res,next)=>{
         message:'user Deleted Successfully'
     });
 });
-
+//to get top 5 tours
 exports.getTourStats = catchAsync(async (req, res,next) => {
 
       const stats = await Tour.aggregate([

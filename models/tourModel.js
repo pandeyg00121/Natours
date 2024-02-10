@@ -126,6 +126,12 @@ tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 });
 
+//virtually populate reviews for a tour without storing reference to reviews
+tourSchema.virtual('reviews', {
+  ref : 'Review',
+  foreignField : 'tour',
+  localField : '_id'
+});
 // DOCUMENT MIDDLEWARE :runs before .save()
 //this middleware is executed before any document is saved
 
