@@ -1,11 +1,11 @@
-const fs=require('fs');
-const express=require('express');
+const fs = require("fs");
+const express = require("express");
 
-const tourController=require('./../controllers/tourController');
-const authController = require('./../controllers/authController');
-const reviewRouter = require('./../routes/reviewRoutes');
+const tourController = require("./../controllers/tourController");
+const authController = require("./../controllers/authController");
+const reviewRouter = require("./../routes/reviewRoutes");
 
-const router =express.Router();
+const router = express.Router();
 router.use(express.json());
 
 // router.param('id',tourController.checkId);
@@ -16,23 +16,43 @@ router.use(express.json());
 //     reviewController.createReview
 // );
 //either use this commented code or the line below
-router.use('/:tourId/reviews',reviewRouter);
+router.use("/:tourId/reviews", reviewRouter);
 
-router.route('/top-5-tours')
-    .get(tourController.aliasTopTours,tourController.getAllTour)
+router
+  .route("/top-5-tours")
+  .get(tourController.aliasTopTours, tourController.getAllTour);
 
-router.route('/tour-stats')
-    .get(tourController.getTourStats);
+router.route("/tour-stats").get(tourController.getTourStats);
 
-router.route('/monthly-plan/:year')
-    .get(tourController.getMonthlyPlan);
-router.route('/')
-    .get( authController.protect,tourController.getAllTour)
-    .post(tourController.createTour);  
+router
+   .route("/monthly-plan/:year")
+   .get(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide",'guide'),
+    tourController.getMonthlyPlan
+    );
 
-router.route('/:id')
-    .get( tourController.getTour)
-    .patch(tourController.updateTour)
-    .delete(authController.protect, authController.restrictTo('admin','lead-guide'),tourController.deleteTour);
+router
+  .route("/")
+  .get(tourController.getAllTour)
+  .post(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.createTour
+  );
 
-module.exports=router;
+router
+  .route("/:id")
+  .get(tourController.getTour)
+  .patch(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.updateTour
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.deleteTour
+  );
+
+module.exports = router;
