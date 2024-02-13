@@ -40,6 +40,9 @@ const tourSchema = new mongoose.Schema(
       max: [5, "A tour must have less than or equal to 5 rating"],
       //these both are DATA Vatidators
       min: [1, "A tour must have more than or equal to 1 rating"],
+      //set used to round of ratingAverage
+      set : val => Math.round(val*10) / 10  
+      //val=4.666666 -> round(4.666666*10) -> round(46.6666) -> 47/10 -> 4.7 
     },
     //no of user rated
     ratingsQuantity: {
