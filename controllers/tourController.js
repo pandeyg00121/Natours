@@ -130,5 +130,78 @@ exports.getTourStats = catchAsync(async (req, res,next) => {
           plan
         }
       });
-   
   });
+
+// '/tours-within/:distance/center/:latlng/unit/:unit'
+// /tours-within?distance=233&center=-40,45&unit=mi
+// /tours-within/233/center/33.420755, -95.781260/unit/mi
+
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  // const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+  //we divide by radius of earth in miles or km
+  //radius is in radians (arc/radius)
+
+  if (!lat || !lng) {
+    next(new AppError('Please provide latitutr and longitude in the format lat,lng.', 400));
+  }
+
+// console.log(distance, lat, lng, unit);
+
+// geowithin finds tours with start location in range of radius from lat lang
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
+  });
+  
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      data: tours
+    }
+  });
+});
+//to get distance of all tours from a given cordinate passed in params
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  //when in miles multiply by 0.000621371 to convert in km
+  //when in meter multiply by 0.001 to convert to km 
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    next(new AppError('Please provide latitutr and longitude in the format lat,lng.', 400));
+  }
+
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1]
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier
+      }
+    },
+    //fields mentioned inside project are only visible
+    {
+      $project: {
+        distance: 1,
+        name: 1
+      }
+    }
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: distances
+    }
+  });
+});
