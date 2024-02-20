@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const path= require('path');
 const ratelimit = require("express-rate-limit");
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -15,12 +16,19 @@ const reviewRouter = require("./routes/reviewRoutes");
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views',path.join(__dirname,'views'));
 // GLOBAL MIDDLEWARES------>
+
+//middleware to serve static files
+app.use(express.static(path.join(__dirname,'public')));
 
 //Set security HTTP headers
 app.use(helmet());
+
 //for develpment and status code on console
 app.use(morgan("dev"));
+
 //for rate limiting of requests
 const limiter = ratelimit({
   max: 100,
@@ -51,9 +59,6 @@ app.use(
       ]
     })
   );
-//middleware to serve static files
-app.use(express.static(`${__dirname}/public`));
-
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -62,6 +67,9 @@ app.use((req, res, next) => {
 });
 
 //(3) ROUTES
+app.get('/',(req,res)=>{
+  res.status(200).render('base');
+});
 //this is called mounting a router on a route.
 app.use("/api/v1/tours", tourRouter); //middleware
 app.use("/api/v1/users", userRouter);
