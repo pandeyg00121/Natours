@@ -1,10 +1,18 @@
 doctype html
 html
   head
-    title Natours 
+    title Natours | #{tour}
+    //- writing variable in buffered code is called interpolation 
     link(rel='stylesheet' href='css/style.css')
     link(rel='shortcut icon' type='image/png' href='img/favicon.png')
   body 
-    h1 The Park Camper 
+    h1=tour
+    h2= user.toUpperCase()
+
+    - const x=9; 
+    //-unbuffered code don't have any o/p
+    h3= 2*x 
+    //-buffered code shows o/p
+
     p this is an amazing park tour.
 

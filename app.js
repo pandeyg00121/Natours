@@ -68,7 +68,10 @@ app.use((req, res, next) => {
 
 //(3) ROUTES
 app.get('/',(req,res)=>{
-  res.status(200).render('base');
+  res.status(200).render('base',{
+    tour:'Forest Hiker',
+    user:'Pranay'
+  })
 });
 //this is called mounting a router on a route.
 app.use("/api/v1/tours", tourRouter); //middleware
