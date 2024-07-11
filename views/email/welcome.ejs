@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Welcome to Natours</title>
+  <style>
+    /* Add your email-specific CSS styles here */
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Email Content -->
+  <p>Hi <%= firstName %>,</p>
+  <p>Welcome to Natours, we're glad to have you 🎉🙏</p>
+  <p>We're all a big family here, so make sure to upload your user photo so we get to know you a bit better!</p>
+
+  <table class="btn btn-primary" role="presentation" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td align="left">
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr>
+                <td>
+                  <a href="<%= url %>" target="_blank">Upload user photo</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>If you need any help with booking your next tour, please don't hesitate to contact me!</p>
+  <!-- <p>-/p> -->
+</body>
+</html>
