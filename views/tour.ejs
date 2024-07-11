@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Natours | <%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="shortcut icon" type="image/png" href="https://github.com/lgope/Natours/blob/master/public/img/logo-green-round.png?raw=true">
+  <link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,700">
+</head>
+<body data-alert="<%= alert ? alert : '' %>">
+
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav nav--tours">
+      <a class="nav__el" href="/">All tours</a>
+    </nav>
+    <div class="header__logo">
+      <img src="/img/logo-white.png" alt="Natours logo">
+    </div>
+    <nav class="nav nav--user">
+      <% if (user) { %>
+        <a class="nav__el nav__el--logout" href="/logout">Log out</a>
+        <a class="nav__el" href="/me">
+          <img class="nav__user-img" src="/img/users/<%= user.photo %>" alt="Photo of <%= user.name %>">
+          <span><%= user.name.split(' ')[0] %></span>
+        </a>
+      <% } else { %>
+        <a class="nav__el" href="/login">Log in</a>
+        <a class="nav__el nav__el--cta" href="/signup">Sign up</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="main">
+
+    <!-- Section: Header -->
+    <section class="section-header">
+      <div class="header__hero">
+        <div class="header__hero-overlay">&nbsp;</div>
+        <img class="header__hero-img" src="/img/tours/<%= tour.imageCover %>" alt="<%= tour.name %>">
+      </div>
+      <div class="heading-box">
+        <h1 class="heading-primary">
+          <span><%= tour.name %> tour</span>
+        </h1>
+        <div class="heading-box__group">
+          <div class="heading-box__detail">
+            <svg class="heading-box__icon">
+              <use xlink:href="/img/icons.svg#icon-clock"></use>
+            </svg>
+            <span class="heading-box__text"><%= `${tour.duration} days` %></span>
+          </div>
+          <div class="heading-box__detail">
+            <svg class="heading-box__icon">
+              <use xlink:href="/img/icons.svg#icon-map-pin"></use>
+            </svg>
+            <span class="heading-box__text"><%= tour.startLocation.description %></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Description -->
+    <section class="section-description">
+      <div class="overview-box">
+        <div class="overview-box__group">
+          <h2 class="heading-secondary ma-bt-lg">Quick facts</h2>
+          <% const date = tour.startDates[0].toLocaleString('en-us', { month: 'long', year: 'numeric' }) %>
+          <%+ overviewBox('Next date', date, 'calendar') %>
+          <%+ overviewBox('Difficulty', tour.difficulty, 'trending-up') %>
+          <%+ overviewBox('Participants', `${tour.maxGroupSize} people`, 'user') %>
+          <%+ overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star') %>
+        </div>
+        <div class="overview-box__group">
+          <h2 class="heading-secondary ma-bt-lg">Your tour guides</h2>
+          <% tour.guides.forEach(function(guide) { %>
+            <div class="overview-box__detail">
+              <img class="overview-box__img" src="/img/users/<%= guide.photo %>" alt="<%= guide.name %>">
+              <span class="overview-box__label"><%= guide.role === 'lead-guide' ? 'Lead guide' : 'Tour guide' %></span>
+              <span class="overview-box__text"><%= guide.name %></span>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+      <div class="description-box">
+        <h2 class="heading-secondary ma-bt-lg">About <%= tour.name %> tour</h2>
+        <% const paragraphs = tour.description.split('\n'); %>
+        <% paragraphs.forEach(function(p) { %>
+          <p class="description__text"><%= p %></p>
+        <% }); %>
+      </div>
+    </section>
+
+    <!-- Section: Pictures -->
+    <section class="section-pictures">
+      <% tour.images.forEach(function(img, i) { %>
+        <div class="picture-box">
+          <img class="picture-box__img picture-box__img--<%= i + 1 %>" src="/img/tours/<%= img %>" alt="The Park Camper Tour <%= i + 1 %>">
+        </div>
+      <% }); %>
+    </section>
+
+    <!-- Section: Map -->
+    <section class="section-map">
+      <div id="map" data-locations='<%= JSON.stringify(tour.locations) %>'></div>
+    </section>
+
+    <!-- Section: Reviews -->
+    <section class="section-reviews">
+      <div class="reviews">
+        <% tour.reviews.forEach(function(review) { %>
+          <%+ reviewCard(review) %>
+        <% }); %>
+      </div>
+    </section>
+
+    <!-- Section: Call to Action -->
+    <section class="section-cta">
+      <div class="cta">
+        <div class="cta__img cta__img--logo">
+          <img src="/img/logo-white.png" alt="Natours logo">
+        </div>
+        <img class="cta__img cta__img--1" src="/img/tours/<%= tour.images[1] %>" alt="Tour picture">
+        <img class="cta__img cta__img--2" src="/img/tours/<%= tour.images[2] %>" alt="Tour picture">
+        <div class="cta__content">
+          <h2 class="heading-secondary">What are you waiting for?</h2>
+          <p class="cta__text"><%= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!` %></p>
+          <% if (user) { %>
+            <button id="book-tour" class="btn btn--green span-all-rows" data-tour-id="<%= tour.id %>">Book tour now!</button>
+          <% } else { %>
+            <a href="/login" class="btn btn--green span-all-rows">Log in to book tour</a>
+          <% } %>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__logo">
+      <img src="/img/logo-green.png" alt="Natour logo">
+    </div>
+    <ul class="footer__nav">
+      <li><a href="#">About us</a></li>
+      <li><a href="#">Download apps</a></li>
+      <li><a href="#">Become a guide</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <p class="footer__copyright">&copy; by Lakshman Gope.</p>
+  </footer>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="/js/bundle.js"></script>
+</body>
+</html>

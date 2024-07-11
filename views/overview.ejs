@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Natours | <%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="shortcut icon" type="image/png" href="https://github.com/lgope/Natours/blob/master/public/img/logo-green-round.png?raw=true">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,700">
+</head>
+<body data-alert="<%= alert ? alert : '' %>">
+
+  <!-- HEADER -->
+  <header class="header">
+    <nav class="nav nav--tours">
+      <a class="nav__el" href="/">All tours</a>
+    </nav>
+    <div class="header__logo">
+      <img src="/img/logo-white.png" alt="Natours logo">
+    </div>
+    <nav class="nav nav--user">
+      <% if (user) { %>
+        <a class="nav__el nav__el--logout" href="/logout">Log out</a>
+        <a class="nav__el" href="/me">
+          <img class="nav__user-img" src="/img/users/<%= user.photo %>" alt="Photo of <%= user.name %>">
+          <span><%= user.name.split(' ')[0] %></span>
+        </a>
+      <% } else { %>
+        <a class="nav__el" href="/login">Log in</a>
+        <a class="nav__el nav__el--cta" href="/signup">Sign up</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="main">
+    <div class="card-container">
+      <% tours.forEach(function(tour) { %>
+        <div class="card">
+          <div class="card__header">
+            <div class="card__picture">
+              <div class="card__picture-overlay">&nbsp;</div>
+              <img class="card__picture-img" src="/img/tours/<%= tour.imageCover %>" alt="<%= tour.name %>">
+            </div>
+            <h3 class="heading-tertirary">
+              <span><%= tour.name %></span>
+            </h3>
+          </div>
+
+          <div class="card__details">
+            <h4 class="card__sub-heading"><%= `${tour.difficulty} ${tour.duration}-day tour` %></h4>
+            <p class="card__text"><%= tour.summary %></p>
+            <div class="card__data">
+              <svg class="card__icon">
+                <use xlink:href="/img/icons.svg#icon-map-pin"></use>
+              </svg>
+              <span><%= tour.startLocation.description %></span>
+            </div>
+            <div class="card__data">
+              <svg class="card__icon">
+                <use xlink:href="/img/icons.svg#icon-calendar"></use>
+              </svg>
+              <span><%= tour.startDates[0].toLocaleString('en-us', { month: 'long', year: 'numeric' }) %></span>
+            </div>
+            <div class="card__data">
+              <svg class="card__icon">
+                <use xlink:href="/img/icons.svg#icon-flag"></use>
+              </svg>
+              <span><%= `${tour.locations.length} stops` %></span>
+            </div>
+            <div class="card__data">
+              <svg class="card__icon">
+                <use xlink:href="/img/icons.svg#icon-user"></use>
+              </svg>
+              <span><%= `${tour.maxGroupSize} people` %></span>
+            </div>
+          </div>
+
+          <div class="card__footer">
+            <p>
+              <span class="card__footer-value">$<%= tour.price %></span>
+              <span class="card__footer-text">per person</span>
+            </p>
+            <p class="card__ratings">
+              <span class="card__footer-value"><%= tour.ratingsAverage %></span>
+              <span class="card__footer-text">rating (<%= tour.ratingsQuantity %>)</span>
+            </p>
+            <a class="btn btn--green btn--small" href="/tour/<%= tour.slug %>">Details</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer__logo">
+      <img src="/img/logo-green.png" alt="Natour logo">
+    </div>
+    <ul class="footer__nav">
+      <li><a href="#">About us</a></li>
+      <li><a href="#">Download apps</a></li>
+      <li><a href="#">Become a guide</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <p class="footer__copyright">&copy; by Lakshman Gope.</p>
+  </footer>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="/js/bundle.js"></script>
+</body>
+</html>
